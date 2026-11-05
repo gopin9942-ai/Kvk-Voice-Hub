@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VoiceHub</title>
+<style>
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#101321;
+  color:white;
+}
+header {
+  padding:25px 20px;
+  background:#1c2340;
+  text-align:center;
+}
+h1 { color:#54e6d0; margin:0; }
+.container { padding:20px; }
+.room {
+  background:#202943;
+  padding:18px;
+  border-radius:14px;
+  margin:14px 0;
+}
+button {
+  background:#54e6d0;
+  color:#101321;
+  border:0;
+  padding:13px 20px;
+  border-radius:9px;
+  font-weight:bold;
+  margin-top:10px;
+}
+.private { background:#303b5b; }
+</style>
+</head>
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1c2340">
+  <script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js")
+      .then(() => console.log("KVK Voice App Ready"))
+      .catch((error) => console.log(error));
+  });
+}
+  </script>
+<body>
+<header>
+  <h1>KVK VOICE HUB</h1>
+  <p>Talk • Connect • Share</p>
+</header>
+
+<div class="container">
+  <h2>Welcome!</h2>
+  <p>Join a voice room and connect with friends.</p>
+
+  <h3>🌍 Public Rooms</h3>
+  <div class="room">
+    <h3>🎮 Gaming Room</h3>
+    <p>Public voice room</p>
+    <button onclick="joinRoom('Gaming Room')">Join Room</button>
+  </div>
+
+  <div class="room">
+    <h3>💬 Friends Room</h3>
+    <p>Public voice room</p>
+    <button onclick="joinRoom('Friends Room')">Join Room</button>
+  </div>
+
+  <h3>🔒 Private Room</h3>
+  <div class="room">
+    <p>Create your own private room.</p>
+    <button class="private" onclick="createRoom()">Create Room</button>
+  </div>
+
+  <p id="status">Not connected</p>
+</div>
+
+<script>
+function joinRoom(name) {
+  document.getElementById("status").innerText =
+    "Selected: " + name;
+}
+function createRoom() {
+  let code = Math.random().toString(36).substring(2,8).toUpperCase();
+  document.getElementById("status").innerText =
+    "Private room code: " + code;
+}
+</script>
+</body>
+</html>
