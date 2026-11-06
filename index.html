@@ -3,393 +3,443 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#101321">
-<meta name="description" content="KVK Voice App - Talk, Connect and Share">
 <link rel="manifest" href="./manifest.json">
 <title>KVK VOICE APP</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #101321;
-  color: white;
-}
-
-header {
-  background: #1c2340;
-  padding: 20px;
-  text-align: center;
-  border-bottom: 2px solid #54e6d0;
-}
-
-header h1 {
-  color: #54e6d0;
-  margin: 0;
-}
-
-header p {
-  color: #b8c6d8;
-  margin-bottom: 0;
-}
-
-.container {
-  max-width: 650px;
-  margin: auto;
-  padding: 18px;
-}
-
-.card {
-  background: #202943;
-  padding: 18px;
-  margin: 15px 0;
-  border-radius: 14px;
-  border: 1px solid #303b5b;
-}
-
-.card h3 {
-  margin-top: 0;
-}
-
-button {
-  background: #54e6d0;
-  color: #101321;
-  border: none;
-  padding: 12px 18px;
-  border-radius: 9px;
-  font-weight: bold;
-  cursor: pointer;
-  margin: 5px 3px;
-}
-
-button:active {
-  opacity: 0.7;
-}
-
-.secondary {
-  background: #394765;
-  color: white;
-}
-
-.danger {
-  background: #e45b69;
-  color: white;
-}
-
-input {
-  width: 100%;
-  padding: 13px;
-  border-radius: 8px;
-  border: 1px solid #52617d;
-  background: #101a30;
-  color: white;
-  margin: 8px 0;
-  font-size: 16px;
-}
-
-.hidden {
-  display: none;
-}
-
-.room-info {
-  color: #54e6d0;
-  font-size: 14px;
-}
-
-#messages {
-  background: #101a30;
-  height: 190px;
-  overflow-y: auto;
-  padding: 12px;
-  border-radius: 9px;
-  margin-bottom: 10px;
-}
-
-.message {
-  background: #283653;
-  padding: 9px;
-  border-radius: 8px;
-  margin: 7px 0;
-  overflow-wrap: anywhere;
-}
-
-.status {
-  color: #54e6d0;
-  padding: 12px;
-  background: #202943;
-  border-radius: 9px;
-}
-
-footer {
-  text-align: center;
-  color: #8593a9;
-  padding: 25px;
-  font-size: 13px;
-}
+*{box-sizing:border-box}
+body{margin:0;background:#101321;color:white;font-family:Arial,sans-serif}
+header{padding:16px;background:#191f35;display:flex;justify-content:space-between;align-items:center}
+.logo{color:#54d6ff;font-weight:bold;font-size:20px}
+button{border:0;border-radius:10px;padding:12px 16px;background:#287cff;color:white;font-weight:bold;cursor:pointer}
+.secondary{background:#303954}
+.green{background:#16a879}
+.danger{background:#df465b}
+input{width:100%;padding:13px;border-radius:10px;border:1px solid #3b4767;background:#11182b;color:white;margin:8px 0}
+.container{max-width:650px;margin:auto;padding:15px}
+.card{background:#1b2239;border:1px solid #303957;padding:16px;border-radius:15px;margin-bottom:14px}
+h2{font-size:19px}
+p{color:#aeb9d3;font-size:14px;line-height:1.5}
+.center{text-align:center}
+.hidden{display:none!important}
+.row{display:flex;gap:9px;align-items:center}
+.row button{flex:1}
+.room{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#252e49;padding:13px;border-radius:12px;margin:10px 0}
+.avatar{width:48px;height:48px;border-radius:50%;background:#287cff;display:grid;place-items:center;font-size:22px;font-weight:bold;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.profile{display:flex;align-items:center;gap:12px}
+.page{display:none;padding-bottom:90px}
+.page.active{display:block}
+nav{position:fixed;bottom:0;left:0;right:0;background:#191f35;display:flex;justify-content:space-around;padding:10px;z-index:5}
+nav button{background:transparent;color:#aeb9d3;font-size:12px}
+nav button.active{color:#54d6ff}
+#messages{height:260px;overflow:auto;background:#11182b;padding:10px;border-radius:10px;margin:12px 0}
+.msg{background:#26324e;padding:9px;border-radius:10px;margin:8px 0;overflow-wrap:anywhere}
+.msg b{color:#54d6ff;font-size:12px}
+.msg p{color:white;margin:5px 0}
+.small{font-size:12px;color:#9ba9c6}
+#loginScreen{max-width:440px;margin:10vh auto;padding:20px}
+#loginScreen .card{text-align:center;padding:28px}
+#googleBtn{width:100%;background:white;color:#222;margin-top:15px}
+#appShell{display:none}
+footer{text-align:center;color:#71809f;padding:20px;font-size:11px}
 </style>
 </head>
 
 <body>
 
+<!-- GOOGLE LOGIN -->
+<section id="loginScreen">
+ <div class="card">
+  <div style="font-size:45px">🎙️</div>
+  <h1 style="color:#54d6ff">KVK VOICE APP</h1>
+  <p>Talk • Connect • Make Friends</p>
+  <p>Sign in with your Google account to continue.</p>
+  <button id="googleBtn" onclick="loginGoogle()">🌐 Continue with Google</button>
+  <p id="loginStatus" class="small"></p>
+ </div>
+</section>
+
+<!-- MAIN APP -->
+<div id="appShell">
+
 <header>
-  <h1>KVK VOICE APP</h1>
-  <p>Talk • Connect • Share</p>
+ <div class="logo">🎙 KVK VOICE</div>
+ <button class="secondary" onclick="showPage('profile')">👤 Profile</button>
 </header>
 
-<div class="container">
+<main class="container">
 
-  <section id="homePage">
-    <h2>Welcome! 👋</h2>
-    <p>Join a room and connect with friends.</p>
+<section id="home" class="page active">
+ <div class="card">
+  <h2>Welcome to KVK VOICE!</h2>
+  <div class="profile">
+   <div class="avatar" id="homeAvatar">K</div>
+   <div>
+    <b id="homeName">User</b>
+    <p>Welcome to your voice community!</p>
+   </div>
+  </div>
+ </div>
 
-    <h3>🌍 Public Rooms</h3>
+ <h2>🌍 Public Rooms</h2>
+ <div id="publicRooms"></div>
 
-    <div class="card">
-      <h3>🎮 Gaming Room</h3>
-      <p>Talk about games and gaming.</p>
-      <p class="room-info">Public • Demo room</p>
-      <button onclick="joinRoom('Gaming Room')">
-        Join Room
-      </button>
-    </div>
+ <div class="card">
+  <h3>➕ Create Private Room</h3>
+  <button class="green" onclick="createPrivateRoom()">Create Room</button>
+  <div id="privateResult" class="hidden">
+   <p>Your room code:</p>
+   <h2 id="generatedCode"></h2>
+   <button class="secondary" onclick="copyCode()">Copy Code</button>
+  </div>
+ </div>
 
-    <div class="card">
-      <h3>💬 Friends Room</h3>
-      <p>Chat and connect with friends.</p>
-      <p class="room-info">Public • Demo room</p>
-      <button onclick="joinRoom('Friends Room')">
-        Join Room
-      </button>
-    </div>
+ <div class="card">
+  <h3>🔐 Join Private Room</h3>
+  <input id="privateCode" placeholder="Enter room code">
+  <button onclick="joinPrivateRoom()">Join Room</button>
+ </div>
+</section>
 
-    <h3>🔒 Private Room</h3>
+<section id="roomPage" class="page">
+ <div class="card">
+  <button class="secondary" onclick="leaveRoom()">← Leave Room</button>
+  <h2 id="roomTitle">Room</h2>
+  <p id="roomStatus">You joined the room</p>
+  <button id="micBtn" class="green" onclick="toggleMic()">🎙 Unmute</button>
+  <p class="small">Microphone button is a demo in Version 1.0.</p>
+ </div>
 
-    <div class="card">
-      <p>Create a private room code.</p>
-      <button onclick="createRoom()">Create Room</button>
+ <div class="card">
+  <h3>👥 Participants</h3>
+  <p>1 participant (You)</p>
+ </div>
 
-      <div id="createdCode" class="hidden">
-        <p>Your room code:</p>
-        <h2 id="roomCode" class="room-info"></h2>
-        <button class="secondary" onclick="copyCode()">
-          Copy Code
-        </button>
-        <button onclick="joinPrivateRoom()">
-          Enter Room
-        </button>
-      </div>
-    </div>
+ <div class="card">
+  <h3>💬 Room Chat</h3>
+  <div id="messages"></div>
+  <div class="row">
+   <input id="chatInput" placeholder="Type message..." onkeydown="if(event.key==='Enter')sendMessage()">
+   <button onclick="sendMessage()">Send</button>
+  </div>
+ </div>
+</section>
 
-    <div class="card">
-      <h3>Join Private Room</h3>
-      <input id="privateInput" placeholder="Enter room code">
-      <button onclick="enterPrivateRoom()">Join Private Room</button>
-    </div>
+<section id="friends" class="page">
+ <div class="card">
+  <h2>👥 Friends</h2>
+  <input id="friendName" placeholder="Friend username">
+  <button onclick="addFriend()">Add Friend</button>
+  <div id="friendList"></div>
+ </div>
+</section>
 
-    <p id="homeStatus" class="status">
-      Ready to connect
-    </p>
-  </section>
+<section id="profile" class="page">
+ <div class="card">
+  <h2>👤 My Profile</h2>
+  <div class="center">
+   <div class="avatar" id="profileAvatar" style="margin:auto">K</div>
+  </div>
+  <p id="googleEmail"></p>
+  <label>Username</label>
+  <input id="usernameInput" maxlength="20" placeholder="Enter username">
+  <button onclick="saveProfile()">Save Profile</button>
+  <p id="profileStatus"></p>
+  <hr style="border-color:#303957;margin:20px 0">
+  <button class="danger" onclick="logoutGoogle()">Logout</button>
+ </div>
+ <div class="card">
+  <h3>About</h3>
+  <p>KVK VOICE APP – Version 1.0</p>
+ </div>
+</section>
 
-  <section id="roomPage" class="hidden">
-    <button class="secondary" onclick="goHome()">
-      ← Back
-    </button>
+</main>
 
-    <div class="card">
-      <h2 id="activeRoomName">Room</h2>
-      <p class="room-info">Demo room</p>
-      <p>👥 Demo participants: <span id="userCount">1</span></p>
+<nav>
+ <button id="navHome" class="active" onclick="showPage('home')">🏠<br>Home</button>
+ <button id="navFriends" onclick="showPage('friends')">👥<br>Friends</button>
+ <button id="navProfile" onclick="showPage('profile')">👤<br>Profile</button>
+</nav>
 
-      <hr>
-
-      <h3>🎙️ Voice Controls</h3>
-      <p id="micStatus">Microphone: Muted</p>
-      <button id="micButton" onclick="toggleMic()">
-        Unmute
-      </button>
-
-      <p class="room-info">
-        Voice transmission is not connected yet.
-      </p>
-
-      <h3>💬 Room Chat</h3>
-      <div id="messages">
-        <div class="message">
-          Welcome to KVK VOICE APP demo!
-        </div>
-      </div>
-
-      <input
-        id="chatInput"
-        placeholder="Type a message..."
-        maxlength="300"
-      >
-
-      <button onclick="sendMessage()">Send Message</button>
-
-      <hr>
-
-      <button class="danger" onclick="leaveRoom()">
-        Leave Room
-      </button>
-    </div>
-  </section>
-
+<footer>KVK VOICE APP • Version 1.0</footer>
 </div>
 
-<footer>
-  KVK VOICE APP • Version 1.0 Demo
-</footer>
+<script type="module">
 
-<script>
+import { initializeApp }
+ from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+
+import {
+ getAuth,
+ GoogleAuthProvider,
+ signInWithRedirect,
+ getRedirectResult,
+ onAuthStateChanged,
+ signOut,
+ updateProfile
+} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+
+const firebaseConfig = {
+ apiKey: "AIzaSyCO3hWdEOYF2-NhFp4mDtPtUqziYoQMbFM",
+ authDomain: "kvk-voice-app.firebaseapp.com",
+ projectId: "kvk-voice-app",
+ storageBucket: "kvk-voice-app.firebasestorage.app",
+ messagingSenderId: "232069395880",
+ appId: "1:232069395880:web:72054418e3b8cd7370d99d",
+ measurementId: "G-BD0GF8KGD1"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+let currentUser = null;
+let username = "";
 let currentRoom = "";
+let muted = true;
+
+let friends = JSON.parse(localStorage.getItem("kvk_friends") || "[]");
+let privateRooms = JSON.parse(localStorage.getItem("kvk_rooms") || "[]");
+let chats = JSON.parse(localStorage.getItem("kvk_chats") || "{}");
 let currentCode = "";
-let micMuted = true;
 
-function joinRoom(name) {
-  openRoom(name);
+function status(message){
+ document.getElementById("loginStatus").textContent=message;
 }
 
-function openRoom(name) {
-  currentRoom = name;
-
-  document.getElementById("activeRoomName").textContent = name;
-  document.getElementById("homePage").classList.add("hidden");
-  document.getElementById("roomPage").classList.remove("hidden");
-
-  document.getElementById("messages").innerHTML =
-    '<div class="message">Welcome to ' + escapeHTML(name) + '!</div>';
-
-  micMuted = true;
-  updateMic();
-  window.scrollTo(0, 0);
+async function loginGoogle(){
+ try{
+  status("Opening Google login...");
+  await signInWithRedirect(auth,provider);
+ }catch(error){
+  status(error.message);
+ }
 }
 
-function createRoom() {
-  const characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code = "";
+async function logoutGoogle(){
+ try{
+  await signOut(auth);
+ }catch(error){
+  alert(error.message);
+ }
+}
 
-  for (let i = 0; i < 6; i++) {
-    code += characters.charAt(
-      Math.floor(Math.random() * characters.length)
-    );
+getRedirectResult(auth).catch(error=>{
+ status("Login error: "+error.message);
+});
+
+onAuthStateChanged(auth,user=>{
+ currentUser=user;
+
+ if(user){
+  document.getElementById("loginScreen").classList.add("hidden");
+  document.getElementById("appShell").style.display="block";
+
+  username=user.displayName || "New User";
+  updateProfileDisplay();
+  renderPublicRooms();
+  renderFriends();
+
+ }else{
+  document.getElementById("loginScreen").classList.remove("hidden");
+  document.getElementById("appShell").style.display="none";
+ }
+});
+
+function updateProfileDisplay(){
+ document.getElementById("homeName").textContent=username;
+ document.getElementById("usernameInput").value=username;
+ document.getElementById("googleEmail").textContent=currentUser.email || "";
+
+ const photo=currentUser.photoURL;
+ ["homeAvatar","profileAvatar"].forEach(id=>{
+  const el=document.getElementById(id);
+  el.innerHTML="";
+  if(photo){
+   const img=document.createElement("img");
+   img.src=photo;
+   img.alt="Profile";
+   el.appendChild(img);
+  }else{
+   el.textContent=username.charAt(0).toUpperCase();
   }
-
-  currentCode = code;
-
-  document.getElementById("roomCode").textContent = code;
-  document.getElementById("createdCode").classList.remove("hidden");
-  document.getElementById("homeStatus").textContent =
-    "Private demo room created: " + code;
+ });
 }
 
-function copyCode() {
-  if (!currentCode) return;
+async function saveProfile(){
+ const name=document.getElementById("usernameInput").value.trim();
+ if(!name){alert("Enter a username");return;}
 
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(currentCode)
-      .then(() => alert("Room code copied!"))
-      .catch(() => alert("Your room code: " + currentCode));
-  } else {
-    alert("Your room code: " + currentCode);
-  }
+ try{
+  await updateProfile(currentUser,{displayName:name});
+  username=name;
+  updateProfileDisplay();
+  document.getElementById("profileStatus").textContent="Profile updated!";
+ }catch(error){
+  document.getElementById("profileStatus").textContent=error.message;
+ }
 }
 
-function joinPrivateRoom() {
-  if (!currentCode) return;
-  openRoom("Private Room - " + currentCode);
+function showPage(page){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+ document.getElementById(page).classList.add("active");
+
+ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+ if(page==="home" || page==="roomPage")document.getElementById("navHome").classList.add("active");
+ if(page==="friends")document.getElementById("navFriends").classList.add("active");
+ if(page==="profile")document.getElementById("navProfile").classList.add("active");
 }
 
-function enterPrivateRoom() {
-  const code = document.getElementById("privateInput")
-    .value.trim().toUpperCase();
+function renderPublicRooms(){
+ const box=document.getElementById("publicRooms");
+ box.innerHTML="";
 
-  if (code.length !== 6) {
-    alert("Please enter a valid 6-character code.");
-    return;
-  }
-
-  if (code !== currentCode) {
-    alert("This demo only recognizes the code created on this device.");
-    return;
-  }
-
-  openRoom("Private Room - " + code);
+ ["Gaming Room","Friends Room","Chill Room"].forEach(name=>{
+  const div=document.createElement("div");
+  div.className="room";
+  const label=document.createElement("b");
+  label.textContent="🎙 "+name;
+  const btn=document.createElement("button");
+  btn.textContent="Join";
+  btn.onclick=()=>joinRoom(name);
+  div.append(label,btn);
+  box.appendChild(div);
+ });
 }
 
-function toggleMic() {
-  micMuted = !micMuted;
-  updateMic();
+function createPrivateRoom(){
+ currentCode=Math.random().toString(36).substring(2,8).toUpperCase();
+ privateRooms.push(currentCode);
+ localStorage.setItem("kvk_rooms",JSON.stringify(privateRooms));
+ document.getElementById("generatedCode").textContent=currentCode;
+ document.getElementById("privateResult").classList.remove("hidden");
 }
 
-function updateMic() {
-  document.getElementById("micStatus").textContent =
-    micMuted ? "Microphone: Muted" : "Microphone: Unmuted (Demo)";
-
-  document.getElementById("micButton").textContent =
-    micMuted ? "Unmute" : "Mute";
+async function copyCode(){
+ try{
+  await navigator.clipboard.writeText(currentCode);
+  alert("Code copied!");
+ }catch(error){
+  alert("Your code: "+currentCode);
+ }
 }
 
-function sendMessage() {
-  const input = document.getElementById("chatInput");
-  const message = input.value.trim();
-
-  if (!message) {
-    alert("Please type a message.");
-    return;
-  }
-
-  const item = document.createElement("div");
-  item.className = "message";
-  item.textContent = "You: " + message;
-
-  const box = document.getElementById("messages");
-  box.appendChild(item);
-
-  input.value = "";
-  box.scrollTop = box.scrollHeight;
+function joinPrivateRoom(){
+ const code=document.getElementById("privateCode").value.trim().toUpperCase();
+ if(!code){alert("Enter room code");return;}
+ if(!privateRooms.includes(code)){
+  alert("Room not found on this device.");
+  return;
+ }
+ joinRoom("Private Room - "+code);
 }
 
-function escapeHTML(value) {
-  return value.replace(/[&<>"']/g, function(char) {
-    return {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#039;"
-    }[char];
-  });
+function joinRoom(name){
+ currentRoom=name;
+ muted=true;
+ document.getElementById("roomTitle").textContent=name;
+ document.getElementById("micBtn").textContent="🎙 Unmute";
+ document.getElementById("micBtn").className="green";
+ document.getElementById("roomStatus").textContent="You joined "+name;
+ renderMessages();
+ showPage("roomPage");
 }
 
-function leaveRoom() {
-  document.getElementById("roomPage").classList.add("hidden");
-  document.getElementById("homePage").classList.remove("hidden");
-  document.getElementById("homeStatus").textContent =
-    "You left the demo room.";
-  currentRoom = "";
-  window.scrollTo(0, 0);
+function leaveRoom(){
+ currentRoom="";
+ showPage("home");
 }
 
-function goHome() {
-  leaveRoom();
+function toggleMic(){
+ muted=!muted;
+ document.getElementById("micBtn").textContent=muted?"🎙 Unmute":"🔇 Mute";
+ document.getElementById("micBtn").className=muted?"green":"danger";
+ document.getElementById("roomStatus").textContent=muted?"Muted (demo)":"Unmuted (demo)";
 }
 
-if ("serviceWorker" in navigator && location.protocol !== "file:") {
-  window.addEventListener("load", function() {
-    navigator.serviceWorker.register("./sw.js")
-      .catch(function(error) {
-        console.log("Service worker:", error);
-      });
-  });
+function renderMessages(){
+ const box=document.getElementById("messages");
+ box.innerHTML="";
+ (chats[currentRoom] || []).forEach(item=>{
+  const div=document.createElement("div");
+  div.className="msg";
+  const b=document.createElement("b");
+  b.textContent=item.name;
+  const p=document.createElement("p");
+  p.textContent=item.text;
+  div.append(b,p);
+  box.appendChild(div);
+ });
+ box.scrollTop=box.scrollHeight;
 }
+
+function sendMessage(){
+ const input=document.getElementById("chatInput");
+ const message=input.value.trim();
+ if(!message || !currentRoom)return;
+
+ if(!chats[currentRoom])chats[currentRoom]=[];
+ chats[currentRoom].push({name:username,text:message});
+ localStorage.setItem("kvk_chats",JSON.stringify(chats));
+ input.value="";
+ renderMessages();
+}
+
+function addFriend(){
+ const input=document.getElementById("friendName");
+ const name=input.value.trim();
+ if(!name)return;
+ if(friends.some(x=>x.toLowerCase()===name.toLowerCase())){
+  alert("Already added");
+  return;
+ }
+ friends.push(name);
+ localStorage.setItem("kvk_friends",JSON.stringify(friends));
+ input.value="";
+ renderFriends();
+}
+
+function renderFriends(){
+ const box=document.getElementById("friendList");
+ box.innerHTML="";
+ if(!friends.length){
+  box.textContent="No friends added yet.";
+  return;
+ }
+ friends.forEach((name,index)=>{
+  const div=document.createElement("div");
+  div.className="room";
+  const label=document.createElement("b");
+  label.textContent="👤 "+name;
+  const btn=document.createElement("button");
+  btn.className="danger";
+  btn.textContent="Remove";
+  btn.onclick=()=>{
+   friends.splice(index,1);
+   localStorage.setItem("kvk_friends",JSON.stringify(friends));
+   renderFriends();
+  };
+  div.append(label,btn);
+  box.appendChild(div);
+ });
+}
+
+Object.assign(window,{
+ loginGoogle,logoutGoogle,saveProfile,showPage,
+ createPrivateRoom,copyCode,joinPrivateRoom,
+ joinRoom,leaveRoom,toggleMic,sendMessage,addFriend
+});
+
+if("serviceWorker" in navigator){
+ window.addEventListener("load",()=>{
+  navigator.serviceWorker.register("./sw.js").catch(console.error);
+ });
+}
+
 </script>
-
 </body>
 </html>
