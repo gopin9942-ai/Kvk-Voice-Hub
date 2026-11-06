@@ -1,862 +1,484 @@
-```html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ta">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#101321">
-<title>KVK VOICE APP</title>
-<link rel="manifest" href="./manifest.json">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101321">
+  <title>KVK Voice Hub</title>
 
 <style>
-* { box-sizing: border-box; }
+    * { box-sizing: border-box; }
 
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #101321;
-  color: white;
-}
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #101321;
+      color: white;
+    }
 
 button, input { font: inherit; }
 
 button {
-  border: 0;
-  border-radius: 10px;
-  padding: 12px 16px;
-  cursor: pointer;
-  font-weight: bold;
-  background: #5865f2;
-  color: white;
-}
+      width: 100%;
+      padding: 13px 16px;
+      margin: 6px 0;
+      border: 0;
+      border-radius: 10px;
+      background: #5865f2;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
 button:disabled { opacity: .6; cursor: wait; }
+    .green { background: #20a56b; }
+    .red { background: #d94c5c; }
 
 input {
-  width: 100%;
-  padding: 13px;
-  border-radius: 9px;
-  border: 1px solid #39415c;
-  background: #1b2035;
-  color: white;
-  margin: 7px 0 12px;
-}
-
-header {
-  padding: 18px;
-  background: #191e33;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid #303751;
-}
-
-.logo {
-  font-size: 20px;
-  font-weight: bold;
-  color: #8e9aff;
-}
-
-.container {
-  max-width: 650px;
-  margin: auto;
-  padding: 18px;
-}
-
-.card {
-  background: #1b2035;
-  padding: 18px;
-  border-radius: 15px;
-  margin: 14px 0;
-  border: 1px solid #303751;
-}
-
-h2, h3 { margin-top: 0; }
-
-.muted {
-  color: #aab1ca;
-  font-size: 13px;
-}
-
-.green { background: #20a56b; }
-.red { background: #d94c5c; }
-.gray { background: #39415c; }
-.full { width: 100%; }
+      width: 100%;
+      padding: 13px;
+      margin: 7px 0 12px;
+      border: 1px solid #39415c;
+      border-radius: 9px;
+      background: #1b2035;
+      color: white;
+    }
 
 .hidden { display: none !important; }
-#appShell { display: none; }
 
-.page { display: none; }
-.page.active { display: block; }
+header {
+      padding: 16px;
+      background: #191e33;
+      border-bottom: 1px solid #303751;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
 
-nav {
-  display: flex;
-  justify-content: space-around;
-  background: #191e33;
-  padding: 10px 4px;
-  position: sticky;
-  bottom: 0;
-  border-top: 1px solid #303751;
-}
+header button { width: auto; margin: 0; }
 
-nav button {
-  background: transparent;
-  color: #b7bed7;
-  padding: 10px 8px;
-  font-size: 12px;
-}
+.logo { color: #9aa5ff; font-size: 20px; font-weight: bold; }
 
-nav button.active {
-  color: #8e9aff;
-  background: #292f50;
-}
+.container {
+      width: min(100% - 28px, 520px);
+      margin: 24px auto;
+    }
 
-.room, .friend {
-  background: #252b44;
-  padding: 13px;
-  border-radius: 10px;
-  margin: 10px 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-}
+.card {
+      padding: 20px;
+      margin: 14px 0;
+      border: 1px solid #303751;
+      border-radius: 15px;
+      background: #1b2035;
+    }
 
-.avatar {
-  width: 65px;
-  height: 65px;
-  border-radius: 50%;
-  background: #5865f2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 25px;
-  overflow: hidden;
-  margin-bottom: 12px;
-}
-
-.avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-#messages {
-  height: 260px;
-  overflow-y: auto;
-  background: #101321;
-  border-radius: 10px;
-  padding: 10px;
-  margin: 12px 0;
-}
-
-.msg {
-  background: #252b44;
-  padding: 10px;
-  margin: 8px 0;
-  border-radius: 9px;
-  overflow-wrap: anywhere;
-}
-
-.msg p { margin-bottom: 0; }
-
-.chatrow {
-  display: flex;
-  gap: 7px;
-}
-
-.chatrow input {
-  flex: 1;
-  min-width: 0;
-}
+.muted { color: #aab1ca; font-size: 14px; }
+    .status { color: #ffca70; min-height: 22px; overflow-wrap: anywhere; }
 
 #loginScreen {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-}
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
 
 .loginbox {
-  width: 100%;
-  max-width: 400px;
-  background: #1b2035;
-  padding: 28px;
-  border-radius: 18px;
-  text-align: center;
-  border: 1px solid #303751;
-}
+      width: min(100%, 400px);
+      padding: 28px;
+      border: 1px solid #303751;
+      border-radius: 18px;
+      background: #1b2035;
+      text-align: center;
+    }
 
-#loginStatus, #profileStatus {
-  color: #ffca70;
-  font-size: 13px;
-  overflow-wrap: anywhere;
-  margin-top: 12px;
-}
-
-.small {
-  font-size: 12px;
-  color: #aab1ca;
-  line-height: 1.5;
-}
-</style>
+#app { display: none; }
+  </style>
 </head>
 
 <body>
-
-<!-- LOGIN -->
-<section id="loginScreen">
-  <div class="loginbox">
-    <div style="font-size:48px">🎙️</div>
-    <h1 class="logo">KVK VOICE APP</h1>
-    <p class="muted">Talk • Connect • Share</p>
-
-    <button id="googleBtn" class="full" onclick="loginGoogle()">
-      Continue with Google
-    </button>
-
-    <p id="loginStatus">Sign in to enter KVK Voice.</p>
-    <p class="small">Welcome to KVK Voice Community!</p>
-  </div>
-</section>
-
-<!-- MAIN APP -->
-<div id="appShell">
-
-<header>
-  <div class="logo">🎙 KVK VOICE</div>
-  <button class="red" onclick="logoutGoogle()">Logout</button>
-</header>
-
-<div class="container">
-
-<!-- HOME -->
-<section id="home" class="page active">
-
-  <div class="card">
-    <p class="muted">WELCOME BACK</p>
-    <div class="avatar" id="homeAvatar">👤</div>
-    <h2 id="homeName">User</h2>
-    <p class="muted">Welcome to KVK Voice Community!</p>
-  </div>
-
-  <div class="card">
-    <h3>🌍 Public Rooms</h3>
-    <div id="publicRooms"></div>
-  </div>
-
-  <div class="card">
-    <h3>🔒 Create Private Room</h3>
-    <button class="full" onclick="createPrivateRoom()">
-      Create Room Code
-    </button>
-
-    <div id="privateResult" class="hidden">
-      <p>Your room code:</p>
-      <h2 id="generatedCode"></h2>
-      <button class="green full" onclick="copyCode()">Copy Code</button>
+  <section id="loginScreen">
+    <div class="loginbox">
+      <div style="font-size:48px">🎙️</div>
+      <h1 class="logo">KVK VOICE HUB</h1>
+      <p class="muted">Voice rooms • Invite link • Mic controls</p>
+      <button id="googleBtn">Continue with Google</button>
+      <p id="loginStatus" class="status">Sign in to continue.</p>
     </div>
+  </section>
+
+<div id="app">
+    <header>
+      <div class="logo">🎙 KVK VOICE HUB</div>
+      <button id="logoutBtn" class="red">Logout</button>
+    </header>
+
+<main class="container">
+      <section class="card">
+        <h2 id="welcome">Welcome</h2>
+        <p class="muted">Create a room or enter an invite code.</p>
+
+<button id="createRoomBtn">Create voice room</button>
+
+<label for="roomInput">Room code or invite link</label>
+        <input id="roomInput" placeholder="Enter room code">
+
+<button id="joinRoomBtn">Join room</button>
+        <button id="shareBtn" class="green">Share room link</button>
+
+<p id="roomStatus" class="status">Not connected.</p>
+        <p id="participantStatus" class="muted"></p>
+      </section>
+
+<section class="card">
+        <h2>🎙 Voice controls</h2>
+        <button id="micBtn" class="green" disabled>Unmute microphone</button>
+        <button id="leaveBtn" class="red" disabled>Leave room</button>
+        <p class="muted">
+          Join செய்யும்போது mic mute-ஆக இருக்கும். பேச, Unmute அழுத்தி microphone permission கொடுங்கள்.
+        </p>
+      </section>
+    </main>
   </div>
-
-  <div class="card">
-    <h3>Join Private Room</h3>
-    <input id="privateCode" placeholder="Enter room code">
-    <button class="full" onclick="joinPrivateRoom()">Join Room</button>
-  </div>
-
-</section>
-
-<!-- ROOM -->
-<section id="roomPage" class="page">
-
-  <div class="card">
-    <h2 id="roomTitle">Room</h2>
-    <p class="muted" id="roomStatus">Welcome!</p>
-
-    <div class="card">
-      <h3>🎙 Voice Controls</h3>
-      <button id="micBtn" class="green full" onclick="toggleMic()">
-        Unmute
-      </button>
-      <p class="small">
-        Demo control only. Real voice transmission is not connected yet.
-      </p>
-    </div>
-
-    <div class="card">
-      <h3>💬 Room Chat</h3>
-      <div id="messages"></div>
-      <div class="chatrow">
-        <input id="chatInput" placeholder="Type a message">
-        <button onclick="sendMessage()">Send</button>
-      </div>
-    </div>
-
-    <button class="red full" onclick="leaveRoom()">Leave Room</button>
-  </div>
-
-</section>
-
-<!-- FRIENDS -->
-<section id="friends" class="page">
-  <div class="card">
-    <h2>👥 Friends</h2>
-    <input id="friendName" placeholder="Enter friend's name">
-    <button class="full" onclick="addFriend()">Add Friend</button>
-    <div id="friendList"></div>
-  </div>
-</section>
-
-<!-- PROFILE -->
-<section id="profile" class="page">
-  <div class="card">
-    <h2>My Profile</h2>
-    <div class="avatar" id="profileAvatar">👤</div>
-    <p class="muted" id="googleEmail"></p>
-    <label>Username</label>
-    <input id="usernameInput" placeholder="Your username">
-    <button class="full" onclick="saveProfile()">Save Profile</button>
-    <p id="profileStatus"></p>
-  </div>
-</section>
-
-</div>
-
-<nav>
-  <button id="navHome" class="active" onclick="showPage('home')">
-    🏠<br>Home
-  </button>
-  <button id="navFriends" onclick="showPage('friends')">
-    👥<br>Friends
-  </button>
-  <button id="navProfile" onclick="showPage('profile')">
-    👤<br>Profile
-  </button>
-</nav>
-
-</div>
 
 <script type="module">
-
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+    import { initializeApp }
+      from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
 
 import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  onAuthStateChanged,
-  signOut,
-  updateProfile,
-  setPersistence,
-  browserLocalPersistence
-} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
-// FIREBASE CONFIG
-const firebaseConfig = {
-  apiKey: "AIzaSyCO3hWdEOYF2-Np4mDtPtUqziYoQMbFM",
-  authDomain: "kvk-voice-app.firebaseapp.com",
-  projectId: "kvk-voice-app",
-  storageBucket: "kvk-voice-app.firebasestorage.app",
-  messagingSenderId: "232069395880",
-  appId: "1:232069395880:web:72054418e3b8cd7370d99d",
-  measurementId: "G-BD0GF8KGD1"
-};
-// FIREBASE START
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-
-provider.setCustomParameters({
-  prompt: "select_account"
-});
-
-// APP VARIABLES
-let currentUser = null;
-let username = "";
-let currentRoom = "";
-let muted = true;
-let currentCode = "";
-
-function readStorage(key) {
-  try {
-    const value = JSON.parse(localStorage.getItem(key) || "[]");
-    return value;
-  } catch {
-    return [];
-  }
-}
-
-let friends = readStorage("kvk_friends");
-let privateRooms = readStorage("kvk_rooms");
-let chats = readStorage("kvk_chats");
-
-if (!Array.isArray(friends)) friends = [];
-if (!Array.isArray(privateRooms)) privateRooms = [];
-if (!chats || typeof chats !== "object" || Array.isArray(chats)) chats = {};
-
-// LOGIN STATUS
-function setLoginStatus(message) {
-  document.getElementById("loginStatus").textContent = message;
-}
-
-// GOOGLE LOGIN
-async function loginGoogle() {
-
-  const btn = document.getElementById("googleBtn");
-
-  try {
-
-    btn.disabled = true;
-    btn.textContent = "Connecting...";
-
-    setLoginStatus("Connecting to Google...");
-
-    await setPersistence(auth, browserLocalPersistence);
-
-    await signInWithPopup(auth, provider);
-
-    setLoginStatus("Login successful!");
-
-  } catch (error) {
-
-    console.error("Google Login Error:", error);
-
-    let message = error.message;
-
-    if (error.code === "auth/unauthorized-domain") {
-      message = "Domain not authorized. Add gopin9942-ai.github.io in Firebase Authentication settings.";
-    } else if (error.code === "auth/popup-blocked") {
-      message = "Popup blocked. Allow popups in Chrome and try again.";
-    } else if (error.code === "auth/popup-closed-by-user") {
-      message = "Login cancelled. Try again.";
-    } else if (error.code === "auth/network-request-failed") {
-      message = "Network error. Check your internet connection.";
-    }
-
-    setLoginStatus("Login Error: " + message);
-
-  } finally {
-
-    btn.disabled = false;
-    btn.textContent = "Continue with Google";
-
-  }
-}
-
-// AUTH STATE
-onAuthStateChanged(auth, user => {
-
-  currentUser = user;
-
-  if (user) {
-
-    document.getElementById("loginScreen").classList.add("hidden");
-    document.getElementById("appShell").style.display = "block";
-
-    username = user.displayName || "New User";
-
-    updateProfileDisplay();
-    renderPublicRooms();
-    renderFriends();
-
-  } else {
-
-    document.getElementById("loginScreen").classList.remove("hidden");
-    document.getElementById("appShell").style.display = "none";
-
-  }
-
-});
-
-// LOGOUT
-async function logoutGoogle() {
-
-  try {
-
-    await signOut(auth);
-    currentRoom = "";
-    showPage("home");
-
-  } catch (error) {
-
-    alert("Logout error: " + error.message);
-
-  }
-
-}
-
-// PROFILE DISPLAY
-function updateProfileDisplay() {
-
-  if (!currentUser) return;
-
-  document.getElementById("homeName").textContent = username;
-  document.getElementById("usernameInput").value = username;
-
-  document.getElementById("googleEmail").textContent =
-    currentUser.email || "";
-
-  const photo = currentUser.photoURL;
-
-  ["homeAvatar", "profileAvatar"].forEach(id => {
-
-    const el = document.getElementById(id);
-    el.innerHTML = "";
-
-    if (photo) {
-
-      const img = document.createElement("img");
-      img.src = photo;
-      img.alt = "Profile";
-      el.appendChild(img);
-
-    } else {
-
-      el.textContent = username.charAt(0).toUpperCase();
-
-    }
-
-  });
-
-}
-
-// SAVE PROFILE
-async function saveProfile() {
-
-  if (!currentUser) return;
-
-  const name = document.getElementById("usernameInput").value.trim();
-
-  if (!name) {
-    alert("Enter a username");
-    return;
-  }
-
-  try {
-
-    await updateProfile(currentUser, {
-      displayName: name
-    });
-
-    username = name;
-    updateProfileDisplay();
-
-    document.getElementById("profileStatus").textContent =
-      "Profile updated successfully!";
-
-  } catch (error) {
-
-    document.getElementById("profileStatus").textContent =
-      "Error: " + error.message;
-
-  }
-
-}
-
-// PAGE NAVIGATION
-function showPage(page) {
-
-  document.querySelectorAll(".page").forEach(p => {
-    p.classList.remove("active");
-  });
-
-  document.getElementById(page).classList.add("active");
-
-  document.querySelectorAll("nav button").forEach(b => {
-    b.classList.remove("active");
-  });
-
-  if (page === "home" || page === "roomPage") {
-    document.getElementById("navHome").classList.add("active");
-  }
-
-  if (page === "friends") {
-    document.getElementById("navFriends").classList.add("active");
-  }
-
-  if (page === "profile") {
-    document.getElementById("navProfile").classList.add("active");
-  }
-
-}
-
-// PUBLIC ROOMS
-function renderPublicRooms() {
-
-  const box = document.getElementById("publicRooms");
-  box.innerHTML = "";
-
-  ["Gaming Room", "Friends Room", "Chill Room"].forEach(name => {
-
-    const div = document.createElement("div");
-    div.className = "room";
-
-    const label = document.createElement("b");
-    label.textContent = "🎙 " + name;
-
-    const btn = document.createElement("button");
-    btn.textContent = "Join";
-    btn.onclick = () => joinRoom(name);
-
-    div.append(label, btn);
-    box.appendChild(div);
-
-  });
-
-}
-
-// CREATE PRIVATE ROOM
-function createPrivateRoom() {
-
-  currentCode = Math.random()
-    .toString(36)
-    .substring(2, 8)
-    .toUpperCase();
-
-  privateRooms.push(currentCode);
-
-  localStorage.setItem(
-    "kvk_rooms",
-    JSON.stringify(privateRooms)
-  );
-
-  document.getElementById("generatedCode").textContent = currentCode;
-  document.getElementById("privateResult").classList.remove("hidden");
-
-}
-
-// COPY CODE
-async function copyCode() {
-
-  try {
-
-    await navigator.clipboard.writeText(currentCode);
-    alert("Code copied!");
-
-  } catch {
-
-    alert("Your room code: " + currentCode);
-
-  }
-
-}
-
-// JOIN PRIVATE ROOM
-function joinPrivateRoom() {
-
-  const code = document.getElementById("privateCode")
-    .value.trim().toUpperCase();
-
-  if (!code) {
-    alert("Enter room code");
-    return;
-  }
-
-  if (!privateRooms.includes(code)) {
-    alert("Room not found on this device.");
-    return;
-  }
-
-  joinRoom("Private Room - " + code);
-
-}
-
-// JOIN ROOM
-function joinRoom(name) {
-
-  currentRoom = name;
-  muted = true;
-
-  document.getElementById("roomTitle").textContent = name;
-  document.getElementById("micBtn").textContent = "🎙 Unmute";
-  document.getElementById("micBtn").className = "green full";
-
-  document.getElementById("roomStatus").textContent =
-    "You joined " + name;
-
-  renderMessages();
-  showPage("roomPage");
-
-}
-
-// LEAVE ROOM
-function leaveRoom() {
-
-  currentRoom = "";
-  showPage("home");
-
-}
-
-// MUTE DEMO
-function toggleMic() {
-
-  muted = !muted;
-
-  document.getElementById("micBtn").textContent =
-    muted ? "🎙 Unmute" : "🔇 Mute";
-
-  document.getElementById("micBtn").className =
-    muted ? "green full" : "red full";
-
-  document.getElementById("roomStatus").textContent =
-    muted ? "Muted (demo)" : "Unmuted (demo)";
-
-}
-
-// CHAT DISPLAY
-function renderMessages() {
-
-  const box = document.getElementById("messages");
-  box.innerHTML = "";
-
-  (chats[currentRoom] || []).forEach(item => {
-
-    const div = document.createElement("div");
-    div.className = "msg";
-
-    const b = document.createElement("b");
-    b.textContent = item.name;
-
-    const p = document.createElement("p");
-    p.textContent = item.text;
-
-    div.append(b, p);
-    box.appendChild(div);
-
-  });
-
-  box.scrollTop = box.scrollHeight;
-
-}
-
-// SEND MESSAGE
-function sendMessage() {
-
-  const input = document.getElementById("chatInput");
-  const message = input.value.trim();
-
-  if (!message || !currentRoom) return;
-
-  if (!chats[currentRoom]) {
-    chats[currentRoom] = [];
-  }
-
-  chats[currentRoom].push({
-    name: username,
-    text: message
-  });
-
-  localStorage.setItem(
-    "kvk_chats",
-    JSON.stringify(chats)
-  );
-
-  input.value = "";
-  renderMessages();
-
-}
-
-// ADD FRIEND
-function addFriend() {
-
-  const input = document.getElementById("friendName");
-  const name = input.value.trim();
-
-  if (!name) return;
-
-  if (friends.some(x =>
-    x.toLowerCase() === name.toLowerCase()
-  )) {
-    alert("Already added");
-    return;
-  }
-
-  friends.push(name);
-
-  localStorage.setItem(
-    "kvk_friends",
-    JSON.stringify(friends)
-  );
-
-  input.value = "";
-  renderFriends();
-
-}
-
-// FRIEND LIST
-function renderFriends() {
-
-  const box = document.getElementById("friendList");
-  box.innerHTML = "";
-
-  if (!friends.length) {
-    box.textContent = "No friends added yet.";
-    return;
-  }
-
-  friends.forEach((name, index) => {
-
-    const div = document.createElement("div");
-    div.className = "friend";
-
-    const label = document.createElement("b");
-    label.textContent = "👤 " + name;
-
-    const btn = document.createElement("button");
-    btn.className = "red";
-    btn.textContent = "Remove";
-
-    btn.onclick = () => {
-
-      friends.splice(index, 1);
-
-      localStorage.setItem(
-        "kvk_friends",
-        JSON.stringify(friends)
-      );
-
-      renderFriends();
-
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      onAuthStateChanged,
+      signOut,
+      setPersistence,
+      browserLocalPersistence
+    } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+
+import { Room, RoomEvent }
+      from "https://esm.sh/livekit-client@2.15.6?bundle";
+
+// உங்கள் Firebase project config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCO3hWdEOYF2-Np4mDtPtUqziYoQMbFM",
+      authDomain: "kvk-voice-app.firebaseapp.com",
+      projectId: "kvk-voice-app",
+      storageBucket: "kvk-voice-app.firebasestorage.app",
+      messagingSenderId: "232069395880",
+      appId: "1:232069395880:web:72054418e3b8cd7370d99d",
+      measurementId: "G-BD0GF8KGD1"
     };
 
-    div.append(label, btn);
-    box.appendChild(div);
+// இவை உங்கள் உண்மையான server URL-களால் மாற்றப்பட வேண்டும்.
+    const LIVEKIT_URL = "wss://YOUR_LIVEKIT_HOST";
+    const TOKEN_ENDPOINT = "https://YOUR_BACKEND_HOST/token";
 
-  });
+const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
-}
+provider.setCustomParameters({ prompt: "select_account" });
 
-// CONNECT HTML BUTTONS
-Object.assign(window, {
-  loginGoogle,
-  logoutGoogle,
-  saveProfile,
-  showPage,
-  createPrivateRoom,
-  copyCode,
-  joinPrivateRoom,
-  joinRoom,
-  leaveRoom,
-  toggleMic,
-  sendMessage,
-  addFriend
-});
+let currentUser = null;
+    let liveRoom = null;
+    let isMuted = true;
+    let leavingRoom = false;
+    const audioElements = new Set();
 
-// SERVICE WORKER
-if ("serviceWorker" in navigator) {
+const $ = (id) => document.getElementById(id);
 
-  window.addEventListener("load", () => {
+function setRoomStatus(message) {
+      $("roomStatus").textContent = message;
+    }
 
-    navigator.serviceWorker.register("./sw.js")
-      .catch(error => console.error("Service Worker Error:", error));
+function parseRoomId(value) {
+      const input = value.trim();
+      let roomId = input;
 
-  });
+try {
+        const url = new URL(input);
+        roomId = url.searchParams.get("room") || roomId;
+      } catch {
+        // Input சாதாரண room code ஆக இருக்கலாம்.
+      }
 
-}
+roomId = roomId.trim().toUpperCase();
+      return /^[A-Z0-9_-]{6,64}$/.test(roomId) ? roomId : null;
+    }
 
-</script>
+function getInviteRoomFromUrl() {
+      const roomId = new URLSearchParams(location.search).get("room");
+      return roomId ? parseRoomId(roomId) : null;
+    }
 
+async function loginGoogle() {
+      const button = $("googleBtn");
+      button.disabled = true;
+      $("loginStatus").textContent = "Google-க்கு connect ஆகிறது…";
+
+try {
+        await setPersistence(auth, browserLocalPersistence);
+        await signInWithPopup(auth, provider);
+      } catch (error) {
+        console.error("Google login error:", error);
+        $("loginStatus").textContent =
+          error.code === "auth/unauthorized-domain"
+            ? "இந்த website domain-ஐ Firebase Authentication → Authorized domains-ல் சேர்க்கவும்."
+            : error.code === "auth/popup-blocked"
+              ? "Popup block ஆகியுள்ளது. Browser popup-ஐ அனுமதித்து மீண்டும் முயற்சி செய்யுங்கள்."
+              : `Login முடியவில்லை: ${error.message}`;
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+async function logoutGoogle() {
+      await leaveRoom(false);
+      await signOut(auth);
+    }
+
+async function getLiveKitToken(roomName) {
+      const firebaseToken = await currentUser.getIdToken();
+
+const response = await fetch(TOKEN_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${firebaseToken}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ roomName })
+      });
+
+const data = await response.json().catch(() => ({}));
+
+if (!response.ok || !data.token) {
+        throw new Error(data.error || `Token server error (${response.status})`);
+      }
+
+return data.token;
+    }
+
+async function joinRoom(roomName) {
+      if (!currentUser) {
+        setRoomStatus("முதலில் Google-ல் sign in செய்யுங்கள்.");
+        return;
+      }
+
+if (!roomName) {
+        setRoomStatus("சரியான room code அல்லது invite link-ஐ உள்ளிடுங்கள்.");
+        return;
+      }
+
+$("joinRoomBtn").disabled = true;
+      $("createRoomBtn").disabled = true;
+      setRoomStatus("Voice room-க்கு connect ஆகிறது…");
+
+try {
+        await leaveRoom(false);
+
+const token = await getLiveKitToken(roomName);
+        const room = new Room();
+        liveRoom = room;
+        leavingRoom = false;
+
+room.on(RoomEvent.TrackSubscribed, (track) => {
+          if (track.kind !== "audio") return;
+
+const audio = track.attach();
+          audio.autoplay = true;
+          audio.playsInline = true;
+          audio.style.display = "none";
+          document.body.appendChild(audio);
+          audioElements.add(audio);
+
+audio.play().catch(() => {
+            setRoomStatus("Audio கேட்க முடியவில்லை. Page-ல் ஒருமுறை tap செய்து மீண்டும் முயற்சி செய்யுங்கள்.");
+          });
+        });
+
+room.on(RoomEvent.TrackUnsubscribed, (track) => {
+          track.detach().forEach((element) => {
+            element.remove();
+            audioElements.delete(element);
+          });
+        });
+
+room.on(RoomEvent.ParticipantConnected, updateParticipantCount);
+        room.on(RoomEvent.ParticipantDisconnected, updateParticipantCount);
+
+room.on(RoomEvent.Disconnected, () => {
+          clearAudio();
+          if (!leavingRoom) {
+            liveRoom = null;
+            setRoomStatus("Room connection துண்டிக்கப்பட்டது.");
+            updateControls(false);
+          }
+        });
+
+await room.connect(LIVEKIT_URL, token);
+
+// Join ஆனவுடன் mic mute-ஆக இருக்கும்.
+        await room.localParticipant.setMicrophoneEnabled(false);
+        isMuted = true;
+
+$("roomInput").value = roomName;
+        setRoomStatus(`Room ${roomName}-ல் இணைந்துள்ளீர்கள். Mic mute-ஆக உள்ளது.`);
+        updateControls(true);
+        updateParticipantCount();
+      } catch (error) {
+        console.error("Join room error:", error);
+        liveRoom = null;
+        setRoomStatus(`Room-ல் சேர முடியவில்லை: ${error.message}`);
+        updateControls(false);
+      } finally {
+        $("joinRoomBtn").disabled = false;
+        $("createRoomBtn").disabled = false;
+      }
+    }
+
+async function createRoom() {
+      const roomId = crypto.randomUUID()
+        .replaceAll("-", "")
+        .slice(0, 16)
+        .toUpperCase();
+
+$("roomInput").value = roomId;
+      await joinRoom(roomId);
+    }
+
+async function toggleMic() {
+      if (!liveRoom) {
+        setRoomStatus("முதலில் ஒரு room-ல் join செய்யுங்கள்.");
+        return;
+      }
+
+try {
+        isMuted = !isMuted;
+        await liveRoom.localParticipant.setMicrophoneEnabled(!isMuted);
+
+$("micBtn").textContent = isMuted
+          ? "Unmute microphone"
+          : "Mute microphone";
+
+$("micBtn").className = isMuted ? "green" : "red";
+        setRoomStatus(isMuted ? "Mic mute செய்யப்பட்டுள்ளது." : "Mic on.");
+      } catch (error) {
+        isMuted = true;
+        console.error("Microphone error:", error);
+        setRoomStatus("Mic இயங்கவில்லை. Browser microphone permission-ஐ சரிபாருங்கள்.");
+      }
+    }
+
+async function shareRoomLink() {
+      const roomId = parseRoomId($("roomInput").value);
+
+if (!roomId) {
+        setRoomStatus("முதலில் room create செய்யுங்கள் அல்லது room code உள்ளிடுங்கள்.");
+        return;
+      }
+
+const inviteUrl = new URL(location.href);
+      inviteUrl.search = "";
+      inviteUrl.hash = "";
+      inviteUrl.searchParams.set("room", roomId);
+
+try {
+        if (navigator.share) {
+          await navigator.share({
+            title: "KVK Voice Hub",
+            text: "என் voice room-ல் join செய்யுங்கள்",
+            url: inviteUrl.toString()
+          });
+        } else {
+          await navigator.clipboard.writeText(inviteUrl.toString());
+          setRoomStatus("Invite link copy செய்யப்பட்டது.");
+        }
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          setRoomStatus("Link share முடியவில்லை. Room code-ஐ copy செய்து அனுப்புங்கள்.");
+        }
+      }
+    }
+
+async function leaveRoom(goHome = true) {
+      leavingRoom = true;
+
+if (liveRoom) {
+        try {
+          await liveRoom.disconnect();
+        } catch (error) {
+          console.warn("Disconnect warning:", error);
+        }
+      }
+
+liveRoom = null;
+      clearAudio();
+      isMuted = true;
+      updateControls(false);
+      $("participantStatus").textContent = "";
+
+if (goHome) {
+        setRoomStatus("Room-ஐ விட்டு வெளியேறிவிட்டீர்கள்.");
+      }
+    }
+
+function clearAudio() {
+      for (const audio of audioElements) {
+        audio.pause();
+        audio.srcObject = null;
+        audio.remove();
+      }
+      audioElements.clear();
+    }
+
+function updateControls(connected) {
+      $("micBtn").disabled = !connected;
+      $("leaveBtn").disabled = !connected;
+      $("micBtn").textContent = "Unmute microphone";
+      $("micBtn").className = "green";
+    }
+
+function updateParticipantCount() {
+      if (!liveRoom) return;
+      const count = liveRoom.remoteParticipants.size + 1;
+      $("participantStatus").textContent =
+        `இந்த room-ல் ${count} பேர் இருக்கிறார்கள்.`;
+    }
+
+onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+
+if (user) {
+        $("loginScreen").classList.add("hidden");
+        $("app").style.display = "block";
+        $("welcome").textContent = `வணக்கம், ${user.displayName || "User"}`;
+
+// Invite link வந்திருந்தால் room code-ஐ நிரப்பும்.
+        // User Join room அழுத்தியதும் connect ஆகும்.
+        const inviteRoom = getInviteRoomFromUrl();
+        if (inviteRoom) $("roomInput").value = inviteRoom;
+      } else {
+        $("loginScreen").classList.remove("hidden");
+        $("app").style.display = "none";
+      }
+    });
+
+$("googleBtn").addEventListener("click", loginGoogle);
+    $("logoutBtn").addEventListener("click", logoutGoogle);
+    $("createRoomBtn").addEventListener("click", createRoom);
+
+$("joinRoomBtn").addEventListener("click", () => {
+      const roomId = parseRoomId($("roomInput").value);
+      if (!roomId) {
+        setRoomStatus("சரியான room code அல்லது invite link-ஐ உள்ளிடுங்கள்.");
+        return;
+      }
+      joinRoom(roomId);
+    });
+
+$("shareBtn").addEventListener("click", shareRoomLink);
+    $("micBtn").addEventListener("click", toggleMic);
+    $("leaveBtn").addEventListener("click", () => leaveRoom(true));
+  </script>
 </body>
 </html>
-```
