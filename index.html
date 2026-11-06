@@ -440,6 +440,486 @@ if("serviceWorker" in navigator){
  });
 }
 
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithRedirect,
+  getRedirectResult,
+  onAuthStateChanged,
+  signOut,
+  updateProfile,
+  setPersistence,
+  browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+
+// FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyCO3hWdEOYF2-NpF4mDtPtUqziYoQMbFM",
+  authDomain: "kvk-voice-app.firebaseapp.com",
+  projectId: "kvk-voice-app",
+  storageBucket: "kvk-voice-app.firebasestorage.app",
+  messagingSenderId: "232069395880",
+  appId: "1:232069395880:web:72054418e3b8cd7370d99d",
+  measurementId: "G-BD0GF8KGD1"
+};
+
+// INITIALIZE FIREBASE
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+provider.setCustomParameters({
+  prompt: "select_account"
+});
+
+let currentUser = null;
+let username = "";
+let currentRoom = "";
+let muted = true;
+let currentCode = "";
+
+let friends = JSON.parse(localStorage.getItem("kvk_friends") || "[]");
+let privateRooms = JSON.parse(localStorage.getItem("kvk_rooms") || "[]");
+let chats = JSON.parse(localStorage.getItem("kvk_chats") || "{}");
+
+// STATUS
+function status(message) {
+  document.getElementById("loginStatus").textContent = message;
+}
+
+// GOOGLE LOGIN
+async function loginGoogle() {
+  try {
+    status("Opening Google login...");
+    document.getElementById("googleBtn").disabled = true;
+
+    await setPersistence(auth, browserLocalPersistence);
+
+    await signInWithRedirect(auth, provider);
+
+  } catch (error) {
+    status("Login error: " + error.message);
+    document.getElementById("googleBtn").disabled = false;
+  }
+}
+
+// CHECK GOOGLE REDIRECT RESULT
+try {
+  const result = await getRedirectResult(auth);
+
+  if (result && result.user) {
+    status("Login successful!");
+  }
+} catch (error) {
+  status("Google login error: " + error.message);
+  document.getElementById("googleBtn").disabled = false;
+}
+
+// AUTH STATE LISTENER
+onAuthStateChanged(auth, (user) => {
+
+  currentUser = user;
+
+  if (user) {
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("appShell").style.display = "block";
+
+    username = user.displayName || "New User";
+
+    updateProfileDisplay();
+    renderPublicRooms();
+    renderFriends();
+
+  } else {
+    document.getElementById("loginScreen").classList.remove("hidden");
+    document.getElementById("appShell").style.display = "none";
+    document.getElementById("googleBtn").disabled = false;
+  }
+
+});
+
+// LOGOUT
+async function logoutGoogle() {
+  try {
+    await signOut(auth);
+    currentRoom = "";
+    status("Logged out successfully");
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+// PROFILE DISPLAY
+function updateProfileDisplay() {
+
+  if (!currentUser) return;
+
+  document.getElementById("homeName").textContent = username;
+
+  document.getElementById("usernameInput").value = username;
+
+  document.getElementById("googleEmail").textContent =
+    currentUser.email || "";
+
+  const photo = currentUser.photoURL;
+
+  ["homeAvatar", "profileAvatar"].forEach(id => {
+
+    const el = document.getElementById(id);
+    el.innerHTML = "";
+
+    if (photo) {
+      const img = document.createElement("img");
+      img.src = photo;
+      img.alt = "Profile";
+      el.appendChild(img);
+    } else {
+      el.textContent = username.charAt(0).toUpperCase();
+    }
+
+  });
+}
+
+// SAVE PROFILE
+async function saveProfile() {
+
+  if (!currentUser) return;
+
+  const name = document.getElementById("usernameInput").value.trim();
+
+  if (!name) {
+    alert("Enter a username");
+    return;
+  }
+
+  try {
+
+    await updateProfile(currentUser, {
+      displayName: name
+    });
+
+    username = name;
+    updateProfileDisplay();
+
+    document.getElementById("profileStatus").textContent =
+      "Profile updated!";
+
+  } catch (error) {
+
+    document.getElementById("profileStatus").textContent =
+      error.message;
+
+  }
+}
+
+// PAGE NAVIGATION
+function showPage(page) {
+
+  document.querySelectorAll(".page").forEach(p => {
+    p.classList.remove("active");
+  });
+
+  document.getElementById(page).classList.add("active");
+
+  document.querySelectorAll("nav button").forEach(b => {
+    b.classList.remove("active");
+  });
+
+  if (page === "home" || page === "roomPage") {
+    document.getElementById("navHome").classList.add("active");
+  }
+
+  if (page === "friends") {
+    document.getElementById("navFriends").classList.add("active");
+  }
+
+  if (page === "profile") {
+    document.getElementById("navProfile").classList.add("active");
+  }
+}
+
+// PUBLIC ROOMS
+function renderPublicRooms() {
+
+  const box = document.getElementById("publicRooms");
+  box.innerHTML = "";
+
+  ["Gaming Room", "Friends Room", "Chill Room"].forEach(name => {
+
+    const div = document.createElement("div");
+    div.className = "room";
+
+    const label = document.createElement("b");
+    label.textContent = "🎙 " + name;
+
+    const btn = document.createElement("button");
+    btn.textContent = "Join";
+    btn.onclick = () => joinRoom(name);
+
+    div.append(label, btn);
+    box.appendChild(div);
+
+  });
+
+}
+
+// CREATE PRIVATE ROOM
+function createPrivateRoom() {
+
+  currentCode = Math.random()
+    .toString(36)
+    .substring(2, 8)
+    .toUpperCase();
+
+  privateRooms.push(currentCode);
+
+  localStorage.setItem(
+    "kvk_rooms",
+    JSON.stringify(privateRooms)
+  );
+
+  document.getElementById("generatedCode").textContent = currentCode;
+
+  document.getElementById("privateResult").classList.remove("hidden");
+
+}
+
+// COPY ROOM CODE
+async function copyCode() {
+
+  try {
+
+    await navigator.clipboard.writeText(currentCode);
+    alert("Code copied!");
+
+  } catch (error) {
+
+    alert("Your room code: " + currentCode);
+
+  }
+
+}
+
+// JOIN PRIVATE ROOM
+function joinPrivateRoom() {
+
+  const code = document.getElementById("privateCode")
+    .value.trim().toUpperCase();
+
+  if (!code) {
+    alert("Enter room code");
+    return;
+  }
+
+  if (!privateRooms.includes(code)) {
+    alert("Room not found on this device.");
+    return;
+  }
+
+  joinRoom("Private Room - " + code);
+
+}
+
+// JOIN ROOM
+function joinRoom(name) {
+
+  currentRoom = name;
+  muted = true;
+
+  document.getElementById("roomTitle").textContent = name;
+
+  document.getElementById("micBtn").textContent = "🎙 Unmute";
+  document.getElementById("micBtn").className = "green";
+
+  document.getElementById("roomStatus").textContent =
+    "You joined " + name;
+
+  renderMessages();
+  showPage("roomPage");
+
+}
+
+// LEAVE ROOM
+function leaveRoom() {
+
+  currentRoom = "";
+  showPage("home");
+
+}
+
+// MUTE / UNMUTE DEMO
+function toggleMic() {
+
+  muted = !muted;
+
+  document.getElementById("micBtn").textContent =
+    muted ? "🎙 Unmute" : "🔇 Mute";
+
+  document.getElementById("micBtn").className =
+    muted ? "green" : "danger";
+
+  document.getElementById("roomStatus").textContent =
+    muted ? "Muted (demo)" : "Unmuted (demo)";
+
+}
+
+// DISPLAY CHAT
+function renderMessages() {
+
+  const box = document.getElementById("messages");
+  box.innerHTML = "";
+
+  (chats[currentRoom] || []).forEach(item => {
+
+    const div = document.createElement("div");
+    div.className = "msg";
+
+    const b = document.createElement("b");
+    b.textContent = item.name;
+
+    const p = document.createElement("p");
+    p.textContent = item.text;
+
+    div.append(b, p);
+    box.appendChild(div);
+
+  });
+
+  box.scrollTop = box.scrollHeight;
+
+}
+
+// SEND CHAT MESSAGE
+function sendMessage() {
+
+  const input = document.getElementById("chatInput");
+  const message = input.value.trim();
+
+  if (!message || !currentRoom) return;
+
+  if (!chats[currentRoom]) {
+    chats[currentRoom] = [];
+  }
+
+  chats[currentRoom].push({
+    name: username,
+    text: message
+  });
+
+  localStorage.setItem(
+    "kvk_chats",
+    JSON.stringify(chats)
+  );
+
+  input.value = "";
+  renderMessages();
+
+}
+
+// ADD FRIEND
+function addFriend() {
+
+  const input = document.getElementById("friendName");
+  const name = input.value.trim();
+
+  if (!name) return;
+
+  if (friends.some(x => x.toLowerCase() === name.toLowerCase())) {
+    alert("Already added");
+    return;
+  }
+
+  friends.push(name);
+
+  localStorage.setItem(
+    "kvk_friends",
+    JSON.stringify(friends)
+  );
+
+  input.value = "";
+  renderFriends();
+
+}
+
+// DISPLAY FRIENDS
+function renderFriends() {
+
+  const box = document.getElementById("friendList");
+  box.innerHTML = "";
+
+  if (!friends.length) {
+    box.textContent = "No friends added yet.";
+    return;
+  }
+
+  friends.forEach((name, index) => {
+
+    const div = document.createElement("div");
+    div.className = "room";
+
+    const label = document.createElement("b");
+    label.textContent = "👤 " + name;
+
+    const btn = document.createElement("button");
+    btn.className = "danger";
+    btn.textContent = "Remove";
+
+    btn.onclick = () => {
+
+      friends.splice(index, 1);
+
+      localStorage.setItem(
+        "kvk_friends",
+        JSON.stringify(friends)
+      );
+
+      renderFriends();
+
+    };
+
+    div.append(label, btn);
+    box.appendChild(div);
+
+  });
+
+}
+
+// CONNECT HTML BUTTONS
+Object.assign(window, {
+  loginGoogle,
+  logoutGoogle,
+  saveProfile,
+  showPage,
+  createPrivateRoom,
+  copyCode,
+  joinPrivateRoom,
+  joinRoom,
+  leaveRoom,
+  toggleMic,
+  sendMessage,
+  addFriend
+});
+
+// SERVICE WORKER
+if ("serviceWorker" in navigator) {
+
+  window.addEventListener("load", () => {
+
+    navigator.serviceWorker
+      .register("./sw.js")
+      .catch(error => console.error("SW error:", error));
+
+  });
+
+}
+
 </script>
+
 </body>
 </html>
