@@ -157,8 +157,6 @@ import {
 
 import { Room, RoomEvent }
       from "https://esm.sh/livekit-client@2.15.6?bundle";
-
-// உங்கள் Firebase project config
     const firebaseConfig = {
       apiKey: "AIzaSyCO3hWdEOYF2-Np4mDtPtUqziYoQMbFM",
       authDomain: "kvk-voice-app.firebaseapp.com",
@@ -168,8 +166,6 @@ import { Room, RoomEvent }
       appId: "1:232069395880:web:72054418e3b8cd7370d99d",
       measurementId: "G-BD0GF8KGD1"
     };
-
-// இவை உங்கள் உண்மையான server URL-களால் மாற்றப்பட வேண்டும்.
     const LIVEKIT_URL = "wss://YOUR_LIVEKIT_HOST";
     const TOKEN_ENDPOINT = "https://YOUR_BACKEND_HOST/token";
 
@@ -199,7 +195,6 @@ try {
         const url = new URL(input);
         roomId = url.searchParams.get("room") || roomId;
       } catch {
-        // Input சாதாரண room code ஆக இருக்கலாம்.
       }
 
 roomId = roomId.trim().toUpperCase();
